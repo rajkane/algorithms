@@ -2,6 +2,9 @@ from functools import wraps
 import time
 
 
+total = []
+
+
 def timeit(func):
     @wraps(func)
     def timeit_wrapper(*args, **kwargs):
@@ -9,7 +12,9 @@ def timeit(func):
         result = func(*args, **kwargs)
         end_time = time.perf_counter()
         total_time = end_time - start_time
-        print(f'Function {func.__name__} {args} {kwargs} Took {total_time:.8f} seconds')
+        print(f"Function {func.__name__} {args} {kwargs} \
+        Took {total_time:.6f} sec")
+        total.append(total_time)
         return result
     return timeit_wrapper
 
@@ -29,6 +34,7 @@ def fib_memoize(n: int):
     cache[n] = fib_memoize(n - 1) + fib_memoize(n - 2)
     return cache[n]
 
+
 @timeit
 def fib_iter(n: int):
     """ iteration fibonacci sequence function """
@@ -38,26 +44,40 @@ def fib_iter(n: int):
     return a
 
 
-if __name__ == "__main__":
+def main():
+    total.clear()
     print("""
-    Select: 
+    Select:
     1) Recursion
     2) Memotization
     3) Iteration
     """)
-    print("-----------------------------")
-    i = input("Enter function: ")
-    n = input("Enter n number: ")
-    print("-----------------------------")
+    try:
+        print("-----------------------------")
+        i = int(input("Enter function: "))
+        n = int(input("Enter n number: "))
+        print("-----------------------------")
+        
+        result = []
 
-    i, n = int(i), int(n)
-    if i == 1:
-        result = [fib_recursive(j) for j in range(n)]
-    elif i == 2:
-        result = [fib_memoize(j) for j in range(n)]
-    elif i == 3:
-        result = [fib_iter(j) for j in range(n)]
-    else:
-        result = "Undefined"
+        if i == 1:
+            result = [fib_recursive(j) for j in range(n)]
+        elif i == 2:
+            result = [fib_memoize(j) for j in range(n)]
+        elif i == 3:
+            result = [fib_iter(j) for j in range(n)]
+        else:
+            result = []
+        
+        print("\n")
+        print("----------------------------")
+        print(f"Result: {result}")
+        print(f"Total time: {sum(total):.4f} sec")
+    except ValueError:
+        main()
+    except RecursionError:
+        main()
 
-    print(result)
+
+if __name__ == "__main__":
+    main()
